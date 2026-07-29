@@ -1,0 +1,11 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite the associated manuscript."
+title: "Interpretable Multimodal AI for Early Prediction of Prostate Adenocarcinoma Aggressiveness"
+type: software
+preferred-citation:
+  type: article
+  title: "An Interpretable Artificial Intelligence Framework for Early Prediction of Prostate Adenocarcinoma Aggressiveness"
+  authors:
+    - name: "[Authors — fill in from the final manuscript author list]"
+  journal: "[Journal — fill in once accepted]"
+  year: 2026

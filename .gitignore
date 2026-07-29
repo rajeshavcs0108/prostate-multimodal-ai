@@ -1,0 +1,23 @@
+__pycache__/
+*.pyc
+.venv/
+venv/
+*.egg-info/
+
+# Data & artifacts — real patient data must never be committed
+data/raw/*
+data/processed/*
+data/synthetic/*
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+!data/synthetic/.gitkeep
+
+checkpoints/*
+!checkpoints/.gitkeep
+logs/*
+!logs/.gitkeep
+results/*
+!results/.gitkeep
+
+.DS_Store
+.ipynb_checkpoints/
