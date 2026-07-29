@@ -1,0 +1,78 @@
+# Hyperparameter and pipeline configuration
+# Mirrors Section III (Methodology) and Section IV (Experimental Setup) of the manuscript.
+
+seed:
+  base_seed: 42          # RNG_SEED
+  n_runs: 5               # "five independent runs of the experiment"
+  run_seeds: [42, 43, 44, 45, 46]
+
+data:
+  raw_dir: "data/raw"
+  processed_dir: "data/processed"
+  synthetic_dir: "data/synthetic"
+  modalities: ["imaging", "clinical", "molecular"]
+  clinical_fields: ["age", "cancer_stage", "gleason_score", "psa_level"]
+  molecular:
+    top_k_features: 50          # top-ranked molecular features retained after MI filtering
+    variance_filter_threshold: 0.01
+  split:
+    train: 0.70
+    val: 0.15
+    test: 0.15
+    stratify: true
+
+preprocessing:
+  imaging:
+    intensity_normalization: "z_score"       # scanner-related variability reduction
+    segmentation_model: "pretrained_unet"    # tumor mask M
+    radiomic_feature_families: ["first_order", "shape", "texture_glcm", "texture_glrlm"]
+  clinical:
+    normalization: "z_score"
+    categorical_encoding: "one_hot"
+    missing_value_strategy: "median_impute"
+
+model:
+  latent_dim: 128            # shared embedding dimension d
+  encoders:
+    imaging:  { hidden_dims: [256, 128], activation: "gelu", dropout: 0.2 }
+    clinical: { hidden_dims: [64, 128],  activation: "gelu", dropout: 0.2 }
+    molecular: { hidden_dims: [128, 128], activation: "gelu", dropout: 0.3 }
+  attention_fusion:
+    n_heads: 4
+    attn_dropout: 0.1
+  prediction_head:
+    type: "linear_sigmoid"
+
+loss:
+  bce_weight: 1.0
+  sparsity_weight: 0.01        # L1 regularization on prediction-layer weights
+  attention_reg_weight: 0.005  # penalizes overly diffuse attention (entropy penalty)
+
+training:
+  optimizer: "adamw"
+  learning_rate: 1.0e-4
+  weight_decay: 1.0e-5
+  batch_size: 32
+  max_epochs: 200
+  early_stopping_patience: 20
+  lr_scheduler: "cosine"
+  grad_clip_norm: 1.0
+  device: "cuda"   # falls back to "cpu" automatically if unavailable
+
+evaluation:
+  metrics: ["accuracy", "auc", "f1", "sensitivity", "specificity"]
+  significance_level: 0.05
+  bootstrap_ci: 0.95
+  n_bootstrap: 2000
+
+explainability:
+  shap:
+    n_background_samples: 100
+    n_explain_samples: 200
+  attention_maps: true
+  compare_methods: ["shap", "grad_cam", "lime", "integrated_gradients"]
+
+paths:
+  checkpoint_dir: "checkpoints"
+  log_dir: "logs"
+  results_dir: "results"
